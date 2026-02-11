@@ -50,25 +50,26 @@ export const adminLogin = (req, res) => {
 };
 
 export const createProjectWithQr = async (req, res) => {
-  const { title, sector, abstract, teamMembers, department } = req.body;
+  const { teamNumber, teamName, sector, title, abstract, teamMembers, department } = req.body;
 
-  if (!isNonEmptyString(title) || !isNonEmptyString(sector)) {
-    return res.status(400).json({ error: "title and sector are required" });
+  if (!isNonEmptyString(teamNumber)) {
+    return res.status(400).json({ error: "teamNumber is required" });
   }
 
-  const safeTitle = sanitizeString(title);
-  const projectId = `PRJ-${Date.now().toString().slice(-6)}`;
+  if (!isNonEmptyString(title)) {
+    return res.status(400).json({ error: "title is required" });
+  }
 
+  const projectId = teamNumber;
   const project = {
     id: projectId,
-    title: safeTitle,
-    team_name: sanitizeString(teamMembers || "Team TEJUS"),
-    category: sanitizeString(sector),
-    sector: sanitizeString(sector),
-    abstract: sanitizeString(abstract || ""),
-    team_members: sanitizeString(teamMembers || ""),
+    teamNumber: sanitizeString(teamNumber),
+    teamName: sanitizeString(teamName || ""),
+    title: sanitizeString(title),
+    sector: sanitizeString(sector || ""),
     department: sanitizeString(department || ""),
-    description: sanitizeString(abstract || "")
+    teamMembers: sanitizeString(teamMembers || ""),
+    abstract: sanitizeString(abstract || "")
   };
 
   await createProject(project);
@@ -89,20 +90,19 @@ export const getProjectsAdmin = async (req, res) => {
 
 export const updateProjectAdmin = async (req, res) => {
   const { projectId } = req.params;
-  const { title, sector, abstract, teamMembers, department } = req.body;
+  const { teamName, sector, title, abstract, teamMembers, department } = req.body;
 
   if (!isNonEmptyString(projectId)) {
     return res.status(400).json({ error: "projectId is required" });
   }
 
   const updates = {
+    teamName: sanitizeString(teamName || ""),
     title: sanitizeString(title || ""),
-    category: sanitizeString(sector || ""),
     sector: sanitizeString(sector || ""),
-    abstract: sanitizeString(abstract || ""),
-    team_members: sanitizeString(teamMembers || ""),
     department: sanitizeString(department || ""),
-    description: sanitizeString(abstract || "")
+    teamMembers: sanitizeString(teamMembers || ""),
+    abstract: sanitizeString(abstract || "")
   };
 
   const updated = await updateProject(projectId, updates);
@@ -128,9 +128,10 @@ export const deleteProjectAdmin = async (req, res) => {
 };
 
 export const getVotesAdmin = async (req, res) => {
-  const { projectId, minScore, maxScore, from, to } = req.query;
+  const { projectTitle, teamNumber, minScore, maxScore, from, to } = req.query;
   const filters = {
-    projectId: projectId || null,
+    projectTitle: projectTitle || null,
+    teamNumber: teamNumber || null,
     minScore: minScore !== undefined ? Number(minScore) : null,
     maxScore: maxScore !== undefined ? Number(maxScore) : null,
     from: from || null,

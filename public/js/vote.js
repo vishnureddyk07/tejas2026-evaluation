@@ -7,18 +7,13 @@ const state = {
 
 const elements = {
   title: document.getElementById("project-title"),
-  team: document.getElementById("project-team"),
-  category: document.getElementById("project-category"),
+  teamNumber: document.getElementById("project-team-number"),
   sector: document.getElementById("project-sector"),
   department: document.getElementById("project-department"),
-  members: document.getElementById("project-members"),
-  description: document.getElementById("project-description"),
   nameInput: document.getElementById("voter-name"),
-  nameLock: document.getElementById("name-lock"),
   slider: document.getElementById("score-slider"),
   scoreValue: document.getElementById("score-value"),
   scoreEmoji: document.getElementById("score-emoji"),
-  scoreLabel: document.getElementById("score-label"),
   scoreBar: document.getElementById("score-bar-fill"),
   submitButton: document.getElementById("submit-vote"),
   message: document.getElementById("vote-message"),
@@ -27,9 +22,9 @@ const elements = {
 };
 
 const scoreMeta = [
-  { min: 0, max: 3, label: "Poor", emoji: "😐", color: "#ff5d5d" },
-  { min: 4, max: 7, label: "Good", emoji: "🙂", color: "#ffcc4d" },
-  { min: 8, max: 10, label: "Excellent", emoji: "😄", color: "#3ddc84" }
+  { min: 0, max: 3, emoji: "😞", color: "#ff5d5d" },
+  { min: 4, max: 7, emoji: "🙂", color: "#ffcc4d" },
+  { min: 8, max: 10, emoji: "😄", color: "#3ddc84" }
 ];
 
 const getScoreMeta = (value) => scoreMeta.find((item) => value >= item.min && value <= item.max);
@@ -38,7 +33,6 @@ const setScoreUI = (value) => {
   const meta = getScoreMeta(value);
   elements.scoreValue.textContent = value;
   elements.scoreEmoji.textContent = meta.emoji;
-  elements.scoreLabel.textContent = meta.label;
   elements.scoreBar.style.width = `${value * 10}%`;
   elements.scoreBar.style.background = meta.color;
 };
@@ -85,10 +79,9 @@ const disableVoting = (message) => {
 
 const lockName = (name) => {
   if (name) {
-    localStorage.setItem("tejus_voter_name", name);
+    localStorage.setItem("tejas_voter_name", name);
     elements.nameInput.value = name;
     elements.nameInput.disabled = true;
-    elements.nameLock.textContent = "Name locked to this device.";
   }
 };
 
@@ -133,7 +126,7 @@ const submitVote = async () => {
 const showSuccess = (timestamp) => {
   const finalName = elements.nameInput.value.trim();
   if (finalName) {
-    localStorage.setItem("tejus_voter_name", finalName);
+    localStorage.setItem("tejas_voter_name", finalName);
   }
   elements.successTimestamp.textContent = `Submitted at ${new Date(timestamp).toLocaleString()}`;
   elements.successCard.classList.add("show");
@@ -150,7 +143,7 @@ const init = async () => {
     return;
   }
 
-  const cachedName = localStorage.getItem("tejus_voter_name");
+  const cachedName = localStorage.getItem("tejas_voter_name");
   if (cachedName) {
     lockName(cachedName);
   }
@@ -177,13 +170,10 @@ const init = async () => {
     state.deviceHash = await getDeviceFingerprint();
     const [project, eligibility] = await Promise.all([fetchProject(), checkEligibility()]);
 
-    elements.title.textContent = project.title;
-    elements.team.textContent = project.teamName;
-    elements.category.textContent = project.category;
-    elements.sector.textContent = project.sector ? `Sector: ${project.sector}` : "";
-    elements.department.textContent = project.department ? `Department: ${project.department}` : "";
-    elements.members.textContent = project.teamMembers ? `Team: ${project.teamMembers}` : "";
-    elements.description.textContent = project.description;
+    elements.title.textContent = project.title || 'Loading...';
+    elements.teamNumber.textContent = project.teamNumber || state.projectId;
+    elements.sector.textContent = project.sector || '';
+    elements.department.textContent = project.department || '';
 
     if (eligibility.voterName) {
       lockName(eligibility.voterName);

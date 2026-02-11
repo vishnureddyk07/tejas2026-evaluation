@@ -101,8 +101,10 @@ const initDashboard = async () => {
   let projectCache = [];
 
   const inputs = {
-    title: document.getElementById("project-title"),
+    teamNumber: document.getElementById("project-team-number"),
+    teamName: document.getElementById("project-team-name"),
     sector: document.getElementById("project-sector"),
+    title: document.getElementById("project-title"),
     department: document.getElementById("project-department"),
     members: document.getElementById("project-members"),
     abstract: document.getElementById("project-abstract")
@@ -110,11 +112,13 @@ const initDashboard = async () => {
 
   const resetForm = () => {
     selectedProjectId = null;
-    currentProject.textContent = "No project selected";
-    updateBtn.disabled = true;
-    deleteBtn.disabled = true;
-    inputs.title.value = "";
+    document.getElementById("current-project").textContent = "No project selected";
+    document.getElementById("update-project").disabled = true;
+    document.getElementById("delete-project").disabled = true;
+    inputs.teamNumber.value = "";
+    inputs.teamName.value = "";
     inputs.sector.value = "";
+    inputs.title.value = "";
     inputs.department.value = "";
     inputs.members.value = "";
     inputs.abstract.value = "";
@@ -123,11 +127,13 @@ const initDashboard = async () => {
 
   const setFormFromProject = (project) => {
     selectedProjectId = project.id;
-    currentProject.textContent = `Editing ${project.id}`;
-    updateBtn.disabled = false;
-    deleteBtn.disabled = false;
-    inputs.title.value = project.title || "";
+    document.getElementById("current-project").textContent = `Editing ${project.id}`;
+    document.getElementById("update-project").disabled = false;
+    document.getElementById("delete-project").disabled = false;
+    inputs.teamNumber.value = project.teamNumber || project.id || "";
+    inputs.teamName.value = project.teamName || "";
     inputs.sector.value = project.sector || project.category || "";
+    inputs.title.value = project.title || "";
     inputs.department.value = project.department || "";
     inputs.members.value = project.team_members || project.teamMembers || "";
     inputs.abstract.value = project.abstract || project.description || "";
@@ -147,9 +153,16 @@ const initDashboard = async () => {
   };
 
   createBtn.addEventListener("click", async () => {
+    const teamNumber = inputs.teamNumber.value.trim();
+    if (!teamNumber) {
+      setMessage(projectMessage, "Team Number is required", true);
+      return;
+    }
     const payload = {
-      title: inputs.title.value.trim(),
+      teamNumber: teamNumber,
+      teamName: inputs.teamName.value.trim(),
       sector: inputs.sector.value.trim(),
+      title: inputs.title.value.trim(),
       department: inputs.department.value.trim(),
       teamMembers: inputs.members.value.trim(),
       abstract: inputs.abstract.value.trim()
@@ -169,11 +182,12 @@ const initDashboard = async () => {
     }
   });
 
-  updateBtn.addEventListener("click", async () => {
+  document.getElementById("update-project").addEventListener("click", async () => {
     if (!selectedProjectId) return;
     const payload = {
-      title: inputs.title.value.trim(),
+      teamName: inputs.teamName.value.trim(),
       sector: inputs.sector.value.trim(),
+      title: inputs.title.value.trim(),
       department: inputs.department.value.trim(),
       teamMembers: inputs.members.value.trim(),
       abstract: inputs.abstract.value.trim()
@@ -191,7 +205,7 @@ const initDashboard = async () => {
     }
   });
 
-  deleteBtn.addEventListener("click", async () => {
+  document.getElementById("delete-project").addEventListener("click", async () => {
     if (!selectedProjectId) return;
     if (!confirm(`Delete project ${selectedProjectId}? This removes QR and votes.`)) return;
     setMessage(projectMessage, "Deleting project...");
@@ -209,7 +223,8 @@ const initDashboard = async () => {
 
   document.getElementById("apply-filters").addEventListener("click", async () => {
     const filters = {
-      projectId: document.getElementById("filter-project").value.trim(),
+      projectTitle: document.getElementById("filter-title").value.trim(),
+      teamNumber: document.getElementById("filter-team").value.trim(),
       minScore: document.getElementById("filter-min").value,
       maxScore: document.getElementById("filter-max").value,
       from: document.getElementById("filter-from").value,

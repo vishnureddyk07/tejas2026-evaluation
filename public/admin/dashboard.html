@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin Dashboard | TEJUS 2026</title>
+  <title>Admin Dashboard | TEJAS 2026</title>
   <link rel="stylesheet" href="/admin/admin.css" />
 </head>
 <body>
@@ -12,7 +12,7 @@
       <div style="display:flex; align-items:center; gap:12px;">
         <img src="https://yt3.googleusercontent.com/7sys579QuRAkoPsKw1DMCP5-lAJgmJas4zM6Sk9R8puYGWWW5HBXU1YnZcHn4E4H0RmuONDQOA=s900-c-k-c0x00ffffff-no-rj" alt="Anurag University" style="width:48px;height:48px;border-radius:12px;background:rgba(255,255,255,0.1);padding:6px;" />
         <div>
-          <h1>TEJUS 2026 Admin Dashboard</h1>
+          <h1>TEJAS 2026 Admin Dashboard</h1>
           <p class="muted">Create projects, generate QR codes, and monitor scores.</p>
         </div>
       </div>
@@ -24,12 +24,20 @@
         <h3>Project Editor + QR</h3>
         <p id="current-project" class="muted">No project selected</p>
         <div class="input-group">
-          <label for="project-title">Project Name</label>
-          <input id="project-title" type="text" placeholder="Project Name" />
+          <label for="project-team-number">Team Number *</label>
+          <input id="project-team-number" type="text" placeholder="e.g., T1, S1" />
         </div>
         <div class="input-group">
-          <label for="project-sector">Sector</label>
-          <input id="project-sector" type="text" placeholder="AI & ML" />
+          <label for="project-team-name">Team Name</label>
+          <input id="project-team-name" type="text" placeholder="Team Alpha" />
+        </div>
+        <div class="input-group">
+          <label for="project-sector">Innovation Sector</label>
+          <input id="project-sector" type="text" placeholder="AI & ML, IoT, Web Dev" />
+        </div>
+        <div class="input-group">
+          <label for="project-title">Project Title</label>
+          <input id="project-title" type="text" placeholder="Project Name" />
         </div>
         <div class="input-group">
           <label for="project-department">Department</label>
@@ -61,7 +69,8 @@
     <section class="glass-card">
       <h3>Results & Filters</h3>
       <div class="filters">
-        <input id="filter-project" type="text" placeholder="Project ID" />
+        <input id="filter-title" type="text" placeholder="Project Title" />
+        <input id="filter-team" type="text" placeholder="Team Number" />
         <input id="filter-min" type="number" min="0" max="10" placeholder="Min score" />
         <input id="filter-max" type="number" min="0" max="10" placeholder="Max score" />
         <input id="filter-from" type="datetime-local" />
@@ -72,7 +81,10 @@
         <table>
           <thead>
             <tr>
-              <th>Project</th>
+              <th>Team Number</th>
+              <th>Project Title</th>
+              <th>Department</th>
+              <th>Innovation Sector</th>
               <th>Score</th>
               <th>Voter</th>
               <th>Device</th>
@@ -85,6 +97,6 @@
     </section>
   </main>
 
-  <script src="/admin/admin.js"></script>
+  <script src="/admin/admin.js?v=20260211e"></script>
 </body>
 </html>

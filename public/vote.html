@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TEJUS 2026 Voting</title>
+  <title>TEJAS 2026 Voting</title>
   <link rel="stylesheet" href="/css/styles.css" />
 </head>
 <body>
@@ -19,33 +19,33 @@
     </header>
 
     <section class="glass-card" id="project-card">
-      <div class="project-badge">Project Spotlight</div>
-      <h2 id="project-title">Loading project...</h2>
-      <p id="project-team" class="muted"></p>
-      <p id="project-category" class="chip"></p>
-      <p id="project-sector" class="chip chip-alt"></p>
-      <p id="project-department" class="muted"></p>
-      <p id="project-members" class="muted"></p>
-      <p id="project-description" class="description"></p>
+      <div class="innovation-sector-section" style="margin-bottom: 20px;">
+        <span style="color: white; font-weight: bold; font-size: 24px;">Innovation Sector: </span>
+        <span id="project-sector" style="color: white; font-size: 20px;"></span>
+      </div>
+      
+      <div class="team-info-box" style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+        <p style="color: white; margin: 5px 0;"><strong>Team Number:</strong> <span id="project-team-number"></span></p>
+        <p style="color: white; margin: 5px 0;"><strong>Project Title:</strong> <span id="project-title"></span></p>
+        <p style="color: white; margin: 5px 0;"><strong>Department:</strong> <span id="project-department"></span></p>
+      </div>
     </section>
 
     <section class="glass-card" id="vote-card">
-      <h3>Cast Your Score</h3>
+      <h3>Voter Information</h3>
       <div class="input-group">
-        <label for="voter-name">Voter Name</label>
+        <label for="voter-name">Your Name</label>
         <input id="voter-name" type="text" placeholder="Enter your name" maxlength="40" />
-        <small id="name-lock" class="hint"></small>
       </div>
 
+      <h3 style="margin-top: 30px;">Score</h3>
       <div class="slider-wrap">
         <div class="score-header">
-          <span>Score</span>
           <span id="score-value">7</span>
         </div>
         <input id="score-slider" type="range" min="0" max="10" step="1" value="7" />
         <div class="score-meta">
-          <span id="score-emoji">🙂</span>
-          <span id="score-label">Good</span>
+          <span id="score-emoji" style="font-size: 48px;">🙂</span>
         </div>
         <div class="score-bar">
           <div id="score-bar-fill"></div>
@@ -58,12 +58,12 @@
 
     <section class="glass-card success-card" id="success-card">
       <div class="success-animation">🎉</div>
-      <h3>Vote recorded!</h3>
+      <h3>Thank you for voting at TEJAS 2026!</h3>
       <p id="success-message">Your vote has been recorded successfully.</p>
       <p id="success-timestamp" class="muted"></p>
     </section>
   </main>
 
-  <script src="/js/vote.js"></script>
+  <script src="/js/vote.js?v=20260211j"></script>
 </body>
 </html>

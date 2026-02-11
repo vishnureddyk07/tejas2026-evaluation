@@ -10,13 +10,12 @@ export const fetchProjectById = async (req, res) => {
 
   return res.json({
     id: project.id,
-    title: project.title,
-    teamName: project.team_name || project.teamName,
-    category: project.category,
+    teamNumber: project.teamNumber || project.id,
+    teamName: project.teamName || project.team_name || "",
+    title: project.title || "",
     sector: project.sector || "",
-    abstract: project.abstract || "",
-    teamMembers: project.team_members || project.teamMembers || "",
     department: project.department || "",
-    description: project.description
+    abstract: project.abstract || "",
+    teamMembers: project.teamMembers || project.team_members || ""
   });
 };
