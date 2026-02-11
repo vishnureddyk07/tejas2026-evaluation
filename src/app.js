@@ -61,6 +61,12 @@ app.get("/vote", (req, res) => {
 
 app.get("/qr/:projectId.png", async (req, res) => {
   try {
+    // Set CORS headers for cross-origin image loading
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Methods", "GET");
+    res.setHeader("Content-Type", "image/png");
+    res.setHeader("Cache-Control", "public, max-age=31536000");
+    
     const { getProjectById } = await import("./services/projectService.js");
     const QRCode = await import("qrcode");
     
@@ -74,9 +80,6 @@ app.get("/qr/:projectId.png", async (req, res) => {
     if (project.qrDataUrl) {
       const base64Data = project.qrDataUrl.replace(/^data:image\/png;base64,/, "");
       const imgBuffer = Buffer.from(base64Data, "base64");
-      
-      res.setHeader("Content-Type", "image/png");
-      res.setHeader("Cache-Control", "public, max-age=31536000");
       return res.send(imgBuffer);
     }
     
@@ -88,8 +91,6 @@ app.get("/qr/:projectId.png", async (req, res) => {
       color: { dark: "#0A0A0A", light: "#FFFFFF" }
     });
     
-    res.setHeader("Content-Type", "image/png");
-    res.setHeader("Cache-Control", "public, max-age=31536000");
     res.send(qrBuffer);
   } catch (error) {
     console.error("[QR] Error serving QR:", error.message, error);
