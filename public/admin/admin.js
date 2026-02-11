@@ -107,9 +107,7 @@ const initDashboard = async () => {
     teamName: document.getElementById("project-team-name"),
     sector: document.getElementById("project-sector"),
     title: document.getElementById("project-title"),
-    department: document.getElementById("project-department"),
-    members: document.getElementById("project-members"),
-    abstract: document.getElementById("project-abstract")
+    department: document.getElementById("project-department")
   };
 
   const resetForm = () => {
@@ -122,8 +120,6 @@ const initDashboard = async () => {
     inputs.sector.value = "";
     inputs.title.value = "";
     inputs.department.value = "";
-    inputs.members.value = "";
-    inputs.abstract.value = "";
     qrPreview.innerHTML = "";
   };
 
@@ -137,8 +133,6 @@ const initDashboard = async () => {
     inputs.sector.value = project.sector || project.category || "";
     inputs.title.value = project.title || "";
     inputs.department.value = project.department || "";
-    inputs.members.value = project.team_members || project.teamMembers || "";
-    inputs.abstract.value = project.abstract || project.description || "";
     qrPreview.innerHTML = `<img src="/qr/${project.id}.png" alt="QR" />`;
   };
 
@@ -165,9 +159,7 @@ const initDashboard = async () => {
       teamName: inputs.teamName.value.trim(),
       sector: inputs.sector.value.trim(),
       title: inputs.title.value.trim(),
-      department: inputs.department.value.trim(),
-      teamMembers: inputs.members.value.trim(),
-      abstract: inputs.abstract.value.trim()
+      department: inputs.department.value.trim()
     };
     setMessage(projectMessage, "Generating QR...");
     try {
@@ -190,9 +182,7 @@ const initDashboard = async () => {
       teamName: inputs.teamName.value.trim(),
       sector: inputs.sector.value.trim(),
       title: inputs.title.value.trim(),
-      department: inputs.department.value.trim(),
-      teamMembers: inputs.members.value.trim(),
-      abstract: inputs.abstract.value.trim()
+      department: inputs.department.value.trim()
     };
     setMessage(projectMessage, "Updating project...");
     try {

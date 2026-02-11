@@ -56,7 +56,7 @@ export const adminLogin = (req, res) => {
 };
 
 export const createProjectWithQr = async (req, res) => {
-  const { teamNumber, teamName, sector, title, abstract, teamMembers, department } = req.body;
+  const { teamNumber, teamName, sector, title, department } = req.body;
 
   if (!isNonEmptyString(teamNumber)) {
     return res.status(400).json({ error: "teamNumber is required" });
@@ -73,20 +73,42 @@ export const createProjectWithQr = async (req, res) => {
     teamName: sanitizeString(teamName || ""),
     title: sanitizeString(title),
     sector: sanitizeString(sector || ""),
-    department: sanitizeString(department || ""),
-    teamMembers: sanitizeString(teamMembers || ""),
-    abstract: sanitizeString(abstract || "")
+    department: sanitizeString(department || "")
   };
 
-  await createProject(project);
-  const url = `${config.qrBaseUrl}/vote?projectId=${encodeURIComponent(projectId)}`;
-  const qrDataUrl = await QRCode.toDataURL(url, { width: 512, margin: 2 });
-  const qrDir = path.join(__dirname, "..", "..", "public", "qr");
-  ensureDir(qrDir);
-  const qrFilePath = path.join(qrDir, `${projectId}.png`);
-  await QRCode.toFile(qrFilePath, url, { width: 512, margin: 2 });
+  try {
+    await createProject(project);
+    const url = `${config.qrBaseUrl}/vote?projectId=${encodeURIComponent(projectId)}`;
+    
+    // Generate QR Data URL for preview
+    const qrDataUrl = await QRCode.toDataURL(url, { 
+      width: 512, 
+      margin: 2,
+      color: {
+        dark: "#0A0A0A",
+        light: "#FFFFFF"
+      }
+    });
+    
+    // Generate QR file for gallery
+    const qrDir = path.join(__dirname, "..", "..", "public", "qr");
+    ensureDir(qrDir);
+    const qrFilePath = path.join(qrDir, `${projectId}.png`);
+    
+    await QRCode.toFile(qrFilePath, url, { 
+      width: 512, 
+      margin: 2,
+      color: {
+        dark: "#0A0A0A",
+        light: "#FFFFFF"
+      }
+    });
 
-  return res.status(201).json({ project, qrDataUrl });
+    return res.status(201).json({ project, qrDataUrl });
+  } catch (error) {
+    console.error("QR generation error:", error);
+    throw error;
+  }
 };
 
 export const getProjectsAdmin = async (req, res) => {
@@ -96,7 +118,7 @@ export const getProjectsAdmin = async (req, res) => {
 
 export const updateProjectAdmin = async (req, res) => {
   const { projectId } = req.params;
-  const { teamName, sector, title, abstract, teamMembers, department } = req.body;
+  const { teamName, sector, title, department } = req.body;
 
   if (!isNonEmptyString(projectId)) {
     return res.status(400).json({ error: "projectId is required" });
@@ -106,9 +128,7 @@ export const updateProjectAdmin = async (req, res) => {
     teamName: sanitizeString(teamName || ""),
     title: sanitizeString(title || ""),
     sector: sanitizeString(sector || ""),
-    department: sanitizeString(department || ""),
-    teamMembers: sanitizeString(teamMembers || ""),
-    abstract: sanitizeString(abstract || "")
+    department: sanitizeString(department || "")
   };
 
   const updated = await updateProject(projectId, updates);
@@ -135,15 +155,51 @@ export const deleteProjectAdmin = async (req, res) => {
 
 export const getVotesAdmin = async (req, res) => {
   const { projectTitle, teamNumber, minScore, maxScore, from, to } = req.query;
-  const filters = {
-    projectTitle: projectTitle || null,
-    teamNumber: teamNumber || null,
+  
+  // Fetch all votes with score and date filters
+  const voteFilters = {
+    projectId: null,
     minScore: minScore !== undefined ? Number(minScore) : null,
     maxScore: maxScore !== undefined ? Number(maxScore) : null,
     from: from || null,
     to: to || null
   };
 
-  const votes = await listVotes(filters);
-  return res.json({ votes });
+  const votes = await listVotes(voteFilters);
+  
+  // If project filters are specified, get projects and filter votes
+  if (projectTitle || teamNumber) {
+    const projects = await listProjects();
+    const projectMap = new Map();
+    
+    projects.forEach(p => {
+      if (
+        (!projectTitle || (p.title && p.title.toLowerCase().includes(projectTitle.toLowerCase()))) &&
+        (!teamNumber || p.teamNumber === teamNumber)
+      ) {
+        projectMap.set(p.id, p);
+      }
+    });
+    
+    // Filter votes to only include matching projects
+    return res.json({ 
+      votes: votes.filter(v => projectMap.has(v.projectId)).map(v => ({
+        ...v,
+        project_id: v.projectId,
+        voter_name: v.voterName,
+        device_hash: v.deviceHash,
+        created_at: v.createdAt
+      }))
+    });
+  }
+
+  return res.json({ 
+    votes: votes.map(v => ({
+      ...v,
+      project_id: v.projectId,
+      voter_name: v.voterName,
+      device_hash: v.deviceHash,
+      created_at: v.createdAt
+    }))
+  });
 };

@@ -14,8 +14,6 @@ export const fetchProjectById = async (req, res) => {
     teamName: project.teamName || project.team_name || "",
     title: project.title || "",
     sector: project.sector || "",
-    department: project.department || "",
-    abstract: project.abstract || "",
-    teamMembers: project.teamMembers || project.team_members || ""
+    department: project.department || ""
   });
 };
