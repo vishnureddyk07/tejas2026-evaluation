@@ -78,23 +78,11 @@ export const createProjectWithQr = async (req, res) => {
   }
 
   const projectId = teamNumber;
-  const project = {
-    id: projectId,
-    teamNumber: sanitizeString(teamNumber),
-    teamName: sanitizeString(teamName || ""),
-    title: sanitizeString(title),
-    sector: sanitizeString(sector || ""),
-    department: sanitizeString(department || "")
-  };
-
+  
   try {
-    console.log(`[PROJECT] Saving ${projectId} to database...`);
-    await createProject(project);
-    console.log(`[PROJECT] ✓ ${projectId} saved to database`);
-    
     const url = `${config.qrBaseUrl}/vote?projectId=${encodeURIComponent(projectId)}`;
     
-    // Generate QR Data URL for preview
+    // Generate QR Data URL
     console.log(`[QR] Generating QR code for ${projectId}`);
     const qrDataUrl = await QRCode.toDataURL(url, { 
       width: 512, 
@@ -105,21 +93,21 @@ export const createProjectWithQr = async (req, res) => {
       }
     });
     
-    // Generate QR file for gallery
-    const qrDir = path.join(__dirname, "..", "..", "public", "qr");
-    ensureDir(qrDir);
-    const qrFilePath = path.join(qrDir, `${projectId}.png`);
+    // Save project WITH QR data URL in database
+    const project = {
+      id: projectId,
+      teamNumber: sanitizeString(teamNumber),
+      teamName: sanitizeString(teamName || ""),
+      title: sanitizeString(title),
+      sector: sanitizeString(sector || ""),
+      department: sanitizeString(department || ""),
+      qrDataUrl: qrDataUrl
+    };
     
-    await QRCode.toFile(qrFilePath, url, { 
-      width: 512, 
-      margin: 2,
-      color: {
-        dark: "#0A0A0A",
-        light: "#FFFFFF"
-      }
-    });
+    console.log(`[PROJECT] Saving ${projectId} to database with QR...`);
+    await createProject(project);
+    console.log(`[PROJECT] ✓ ${projectId} saved to database`);
     
-    console.log(`[QR] ✓ QR code saved to ${qrFilePath}`);
     return res.status(201).json({ project, qrDataUrl });
   } catch (error) {
     console.error(`[PROJECT] Error creating ${projectId}:`, error.message);
@@ -159,12 +147,6 @@ export const deleteProjectAdmin = async (req, res) => {
 
   await deleteVotesByProject(projectId);
   await deleteProject(projectId);
-
-  const qrDir = path.join(__dirname, "..", "..", "public", "qr");
-  const qrFilePath = path.join(qrDir, `${projectId}.png`);
-  if (fs.existsSync(qrFilePath)) {
-    fs.unlinkSync(qrFilePath);
-  }
 
   return res.json({ message: "Project and QR deleted" });
 };

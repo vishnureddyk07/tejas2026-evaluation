@@ -61,8 +61,9 @@ const renderGallery = (container, projects, onSelect) => {
   projects.forEach((project) => {
     const item = document.createElement("div");
     item.className = "qr-item";
+    const qrSrc = project.qrDataUrl || `/qr/${project.id}.png`;
     item.innerHTML = `
-      <img src="/qr/${project.id}.png" alt="${project.id}" />
+      <img src="${qrSrc}" alt="${project.id}" />
       <div>
         <div><strong>${project.id}</strong> — ${project.title}</div>
         <div class="muted">${project.category || project.sector || ""}</div>
@@ -79,7 +80,7 @@ const renderGallery = (container, projects, onSelect) => {
     downloadBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       const link = document.createElement("a");
-      link.href = `/qr/${project.id}.png`;
+      link.href = qrSrc;
       link.download = `${project.id}-qr.png`;
       link.click();
     });
@@ -160,7 +161,7 @@ const initDashboard = async () => {
 
   const setFormFromProject = (project) => {
     selectedProjectId = project.id;
-    currentQrDataUrl = `/qr/${project.id}.png`;
+    currentQrDataUrl = project.qrDataUrl || `/qr/${project.id}.png`;
     document.getElementById("current-project").textContent = `Editing ${project.id}`;
     document.getElementById("update-project").disabled = false;
     document.getElementById("delete-project").disabled = false;
@@ -170,7 +171,8 @@ const initDashboard = async () => {
     inputs.sector.value = project.sector || project.category || "";
     inputs.title.value = project.title || "";
     inputs.department.value = project.department || "";
-    qrPreview.innerHTML = `<img src="/qr/${project.id}.png" alt="QR" style="max-width: 300px; border-radius: 8px;" />`;
+    const qrSrc = project.qrDataUrl || `/qr/${project.id}.png`;
+    qrPreview.innerHTML = `<img src="${qrSrc}" alt="QR" style="max-width: 300px; border-radius: 8px;" />`;
   };
 
   const loadProjects = async () => {

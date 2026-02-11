@@ -59,6 +59,28 @@ app.get("/vote", (req, res) => {
   res.sendFile(path.join(publicDir, "vote.html"));
 });
 
+app.get("/qr/:projectId.png", async (req, res) => {
+  try {
+    const { getProjectById } = await import("./services/projectService.js");
+    const project = await getProjectById(req.params.projectId);
+    
+    if (!project || !project.qrDataUrl) {
+      return res.status(404).send("QR code not found");
+    }
+    
+    // Convert data URL to buffer and send as PNG
+    const base64Data = project.qrDataUrl.replace(/^data:image\/png;base64,/, "");
+    const imgBuffer = Buffer.from(base64Data, "base64");
+    
+    res.setHeader("Content-Type", "image/png");
+    res.setHeader("Cache-Control", "public, max-age=31536000");
+    res.send(imgBuffer);
+  } catch (error) {
+    console.error("[QR] Error serving QR:", error);
+    res.status(500).send("Error generating QR code");
+  }
+});
+
 app.use("/api/health", healthRoutes);
 app.use("/api/projects", projectsRoutes);
 app.use("/api/votes", votesRoutes);
