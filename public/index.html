@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEJAS 2026 - Project Expo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: moveGrid 20s linear infinite;
+        }
+
+        @keyframes moveGrid {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 40px;
+            max-width: 900px;
+            width: 90%;
+        }
+
+        .logo-section {
+            margin-bottom: 30px;
+        }
+
+        .logo-section img {
+            width: 120px;
+            height: 120px;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 8px 16px rgba(0,0,0,0.3));
+        }
+
+        h1 {
+            color: white;
+            font-size: 4rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            text-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            letter-spacing: -2px;
+        }
+
+        .subtitle {
+            color: rgba(255,255,255,0.95);
+            font-size: 1.5rem;
+            font-weight: 300;
+            margin-bottom: 15px;
+        }
+
+        .tagline {
+            color: rgba(255,255,255,0.85);
+            font-size: 1.1rem;
+            font-weight: 400;
+            margin-bottom: 50px;
+            line-height: 1.6;
+        }
+
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            display: block;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+        }
+
+        .card-icon {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .card h2 {
+            color: #333;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .card p {
+            color: #666;
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 4px 15px rgba(102,126,234,0.4);
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(102,126,234,0.6);
+        }
+
+        .info-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 40px;
+        }
+
+        .info-section p {
+            color: white;
+            font-size: 0.95rem;
+            line-height: 1.8;
+            margin-bottom: 10px;
+        }
+
+        .footer {
+            margin-top: 50px;
+            color: rgba(255,255,255,0.7);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            .subtitle {
+                font-size: 1.2rem;
+            }
+
+            .tagline {
+                font-size: 1rem;
+            }
+
+            .card-container {
+                grid-template-columns: 1fr;
+            }
+
+            .card {
+                padding: 35px 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo-section">
+            <img src="/assets/au-logo-placeholder.svg" alt="Anurag University Logo" onerror="this.style.display='none'">
+        </div>
+
+        <h1>TEJAS 2026</h1>
+        <p class="subtitle">Project Expo & Innovation Showcase</p>
+        <p class="tagline">
+            Welcome to the premier platform for evaluating innovative student projects at Anurag University.<br>
+            Discover groundbreaking ideas across AI, IoT, Web Development, and more.
+        </p>
+
+        <div class="card-container">
+            <a href="/vote.html" class="card">
+                <span class="card-icon">🗳️</span>
+                <h2>Vote for Projects</h2>
+                <p>Scan project QR codes or enter project IDs to evaluate student innovations and cast your vote.</p>
+                <span class="btn">Start Voting</span>
+            </a>
+
+            <a href="/admin" class="card">
+                <span class="card-icon">👨‍💼</span>
+                <h2>Admin Dashboard</h2>
+                <p>Manage projects, generate QR codes, and view real-time voting results and analytics.</p>
+                <span class="btn">Admin Login</span>
+            </a>
+        </div>
+
+        <div class="info-section">
+            <p><strong>🎯 Innovation Sectors:</strong> AI & ML | IoT & Robotics | Web Development | Data Science | Cybersecurity</p>
+            <p><strong>📱 One Vote Per Device:</strong> Fair and transparent voting system ensures integrity</p>
+            <p><strong>🔒 Secure Platform:</strong> Your vote is recorded securely with device verification</p>
+        </div>
+
+        <div class="footer">
+            <p>© 2026 Anurag University | TEJAS Project Expo</p>
+            <p>Developed by Vishnu Vardhan Reddy | Data Science Department, Section B</p>
+        </div>
+    </div>
+</body>
+</html>
