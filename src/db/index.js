@@ -4,13 +4,37 @@ import { createSqlAdapter } from "./sql.js";
 
 let adapter;
 
+const withTimeout = (promise, timeoutMs = 30000) => {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error(`Database connection timeout after ${timeoutMs}ms`)), timeoutMs)
+    )
+  ]);
+};
+
 export const initDb = async () => {
   if (adapter) return adapter;
 
-  if (config.dbProvider === "mongo") {
-    adapter = await createMongoAdapter(config.dbUrl, { inMemory: config.dbInMemory });
-  } else {
-    adapter = await createSqlAdapter(config.dbUrl, config.dbProvider);
+  console.log(`[DB] Initializing ${config.dbProvider} database...`);
+  console.log(`[DB] Using ${config.dbInMemory ? "in-memory" : "remote"} database`);
+
+  try {
+    if (config.dbProvider === "mongo") {
+      adapter = await withTimeout(
+        createMongoAdapter(config.dbUrl, { inMemory: config.dbInMemory }),
+        30000
+      );
+    } else {
+      adapter = await withTimeout(
+        createSqlAdapter(config.dbUrl, config.dbProvider),
+        30000
+      );
+    }
+    console.log("[DB] ✓ Database initialized successfully");
+  } catch (error) {
+    console.error("[DB] ✗ Database initialization failed:", error.message);
+    throw error;
   }
 
   return adapter;
