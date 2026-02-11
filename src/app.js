@@ -62,21 +62,37 @@ app.get("/vote", (req, res) => {
 app.get("/qr/:projectId.png", async (req, res) => {
   try {
     const { getProjectById } = await import("./services/projectService.js");
+    const QRCode = await import("qrcode");
+    
     const project = await getProjectById(req.params.projectId);
     
-    if (!project || !project.qrDataUrl) {
-      return res.status(404).send("QR code not found");
+    if (!project) {
+      return res.status(404).send("Project not found");
     }
     
-    // Convert data URL to buffer and send as PNG
-    const base64Data = project.qrDataUrl.replace(/^data:image\/png;base64,/, "");
-    const imgBuffer = Buffer.from(base64Data, "base64");
+    // If project has stored QR data URL, use it
+    if (project.qrDataUrl) {
+      const base64Data = project.qrDataUrl.replace(/^data:image\/png;base64,/, "");
+      const imgBuffer = Buffer.from(base64Data, "base64");
+      
+      res.setHeader("Content-Type", "image/png");
+      res.setHeader("Cache-Control", "public, max-age=31536000");
+      return res.send(imgBuffer);
+    }
+    
+    // Otherwise, generate QR on-the-fly (for old projects)
+    const url = `${config.qrBaseUrl}/vote?projectId=${encodeURIComponent(project.id)}`;
+    const qrBuffer = await QRCode.default.toBuffer(url, {
+      width: 512,
+      margin: 2,
+      color: { dark: "#0A0A0A", light: "#FFFFFF" }
+    });
     
     res.setHeader("Content-Type", "image/png");
     res.setHeader("Cache-Control", "public, max-age=31536000");
-    res.send(imgBuffer);
+    res.send(qrBuffer);
   } catch (error) {
-    console.error("[QR] Error serving QR:", error);
+    console.error("[QR] Error serving QR:", error.message, error);
     res.status(500).send("Error generating QR code");
   }
 });
