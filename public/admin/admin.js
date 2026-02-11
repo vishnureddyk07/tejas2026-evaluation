@@ -61,7 +61,7 @@ const renderGallery = (container, projects, onSelect) => {
   projects.forEach((project) => {
     const item = document.createElement("div");
     item.className = "qr-item";
-    const qrSrc = project.qrDataUrl || `/qr/${project.id}.png`;
+    const qrSrc = project.qrDataUrl || `${API_URL}/qr/${project.id}.png`;
     item.innerHTML = `
       <img src="${qrSrc}" alt="${project.id}" />
       <div>
@@ -161,7 +161,7 @@ const initDashboard = async () => {
 
   const setFormFromProject = (project) => {
     selectedProjectId = project.id;
-    currentQrDataUrl = project.qrDataUrl || `/qr/${project.id}.png`;
+    currentQrDataUrl = project.qrDataUrl || `${API_URL}/qr/${project.id}.png`;
     document.getElementById("current-project").textContent = `Editing ${project.id}`;
     document.getElementById("update-project").disabled = false;
     document.getElementById("delete-project").disabled = false;
@@ -171,7 +171,7 @@ const initDashboard = async () => {
     inputs.sector.value = project.sector || project.category || "";
     inputs.title.value = project.title || "";
     inputs.department.value = project.department || "";
-    const qrSrc = project.qrDataUrl || `/qr/${project.id}.png`;
+    const qrSrc = project.qrDataUrl || `${API_URL}/qr/${project.id}.png`;
     qrPreview.innerHTML = `<img src="${qrSrc}" alt="QR" style="max-width: 300px; border-radius: 8px;" />`;
   };
 
