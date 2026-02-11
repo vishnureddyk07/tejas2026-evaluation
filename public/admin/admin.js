@@ -101,6 +101,15 @@ const initDashboard = async () => {
 
   let selectedProjectId = null;
   let projectCache = [];
+  let currentQrDataUrl = null;
+
+  const downloadQr = async () => {
+    if (!currentQrDataUrl || !selectedProjectId) return;
+    const link = document.createElement("a");
+    link.href = currentQrDataUrl;
+    link.download = `${selectedProjectId}-qr.png`;
+    link.click();
+  };
 
   const inputs = {
     teamNumber: document.getElementById("project-team-number"),
@@ -112,9 +121,11 @@ const initDashboard = async () => {
 
   const resetForm = () => {
     selectedProjectId = null;
+    currentQrDataUrl = null;
     document.getElementById("current-project").textContent = "No project selected";
     document.getElementById("update-project").disabled = true;
     document.getElementById("delete-project").disabled = true;
+    document.getElementById("download-qr").disabled = true;
     inputs.teamNumber.value = "";
     inputs.teamName.value = "";
     inputs.sector.value = "";
@@ -125,15 +136,17 @@ const initDashboard = async () => {
 
   const setFormFromProject = (project) => {
     selectedProjectId = project.id;
+    currentQrDataUrl = `/qr/${project.id}.png`;
     document.getElementById("current-project").textContent = `Editing ${project.id}`;
     document.getElementById("update-project").disabled = false;
     document.getElementById("delete-project").disabled = false;
+    document.getElementById("download-qr").disabled = false;
     inputs.teamNumber.value = project.teamNumber || project.id || "";
     inputs.teamName.value = project.teamName || "";
     inputs.sector.value = project.sector || project.category || "";
     inputs.title.value = project.title || "";
     inputs.department.value = project.department || "";
-    qrPreview.innerHTML = `<img src="/qr/${project.id}.png" alt="QR" />`;
+    qrPreview.innerHTML = `<img src="/qr/${project.id}.png" alt="QR" style="max-width: 300px; border-radius: 8px;" />`;
   };
 
   const loadProjects = async () => {
@@ -167,12 +180,17 @@ const initDashboard = async () => {
         method: "POST",
         body: JSON.stringify(payload)
       });
-      qrPreview.innerHTML = `<img src="${result.qrDataUrl}" alt="QR" />`;
-      setMessage(projectMessage, `Created ${result.project.id}`);
-      resetForm();
+      currentQrDataUrl = result.qrDataUrl;
+      qrPreview.innerHTML = `<img src="${result.qrDataUrl}" alt="QR" style="max-width: 300px; border-radius: 8px;" />`;
+      selectedProjectId = result.project.id;
+      document.getElementById("download-qr").disabled = false;
+      setMessage(projectMessage, `✓ Created ${result.project.id}`);
+      await new Promise(resolve => setTimeout(resolve, 1000));
       await loadProjects();
     } catch (error) {
       setMessage(projectMessage, error.message, true);
+      currentQrDataUrl = null;
+      document.getElementById("download-qr").disabled = true;
     }
   });
 
@@ -212,6 +230,8 @@ const initDashboard = async () => {
       setMessage(projectMessage, error.message, true);
     }
   });
+
+  document.getElementById("download-qr").addEventListener("click", downloadQr);
 
   document.getElementById("apply-filters").addEventListener("click", async () => {
     const filters = {
