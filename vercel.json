@@ -1,0 +1,5 @@
+{
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "https://tejas2026-evaluation.onrender.com/api/$1" }
+  ]
+}
