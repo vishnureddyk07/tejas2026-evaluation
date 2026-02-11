@@ -25,7 +25,13 @@ const parseAdminUsers = () => {
 };
 
 const isValidCredential = (email, password) => {
-  return parseAdminUsers().some((user) => user.email === email && user.password === password);
+  const users = parseAdminUsers();
+  console.log("DEBUG: Checking credentials. Config adminUsers:", config.adminUsers);
+  console.log("DEBUG: Parsed users:", users);
+  console.log("DEBUG: Looking for email:", email, "password:", password);
+  const found = users.some((user) => user.email === email && user.password === password);
+  console.log("DEBUG: Credential check result:", found);
+  return found;
 };
 
 const __filename = fileURLToPath(import.meta.url);
