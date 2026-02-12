@@ -96,7 +96,10 @@ const renderVotes = (tbody, votes) => {
     const row = document.createElement("tr");
     const createdAt = vote.created_at || vote.createdAt;
     row.innerHTML = `
-      <td>${vote.project_id || vote.projectId}</td>
+      <td>${vote.teamNumber || vote.project_id || vote.projectId}</td>
+      <td>${vote.projectTitle || ""}</td>
+      <td>${vote.department || ""}</td>
+      <td>${vote.sector || ""}</td>
       <td>${vote.score}</td>
       <td>${vote.voter_name || vote.voterName || ""}</td>
       <td>${vote.device_hash || vote.deviceHash}</td>

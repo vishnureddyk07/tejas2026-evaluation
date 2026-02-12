@@ -165,41 +165,46 @@ export const getVotesAdmin = async (req, res) => {
 
   const votes = await listVotes(voteFilters);
   
-  // If project filters are specified, get projects and filter votes
+  // Always fetch projects to join with votes
+  const projects = await listProjects();
+  const projectMap = new Map();
+  
+  projects.forEach(p => {
+    projectMap.set(p.id, p);
+  });
+  
+  // Apply project filters if specified
+  let filteredVotes = votes;
   if (projectTitle || teamNumber || department || sector) {
-    const projects = await listProjects();
-    const projectMap = new Map();
-    
-    projects.forEach(p => {
-      const titleMatch = !projectTitle || (p.title && p.title.toLowerCase().includes(projectTitle.toLowerCase()));
-      const teamMatch = !teamNumber || p.teamNumber === teamNumber;
-      const deptMatch = !department || (p.department && p.department.toLowerCase().includes(department.toLowerCase()));
-      const sectorMatch = !sector || (p.sector && p.sector.toLowerCase().includes(sector.toLowerCase()));
+    filteredVotes = votes.filter(v => {
+      const project = projectMap.get(v.projectId);
+      if (!project) return false;
       
-      if (titleMatch && teamMatch && deptMatch && sectorMatch) {
-        projectMap.set(p.id, p);
-      }
+      const titleMatch = !projectTitle || (project.title && project.title.toLowerCase().includes(projectTitle.toLowerCase()));
+      const teamMatch = !teamNumber || project.teamNumber === teamNumber;
+      const deptMatch = !department || (project.department && project.department.toLowerCase().includes(department.toLowerCase()));
+      const sectorMatch = !sector || (project.sector && project.sector.toLowerCase().includes(sector.toLowerCase()));
+      
+      return titleMatch && teamMatch && deptMatch && sectorMatch;
     });
-    
-    // Filter votes to only include matching projects
-    return res.json({ 
-      votes: votes.filter(v => projectMap.has(v.projectId)).map(v => ({
+  }
+
+  // Map votes with project details
+  return res.json({ 
+    votes: filteredVotes.map(v => {
+      const project = projectMap.get(v.projectId);
+      return {
         ...v,
         project_id: v.projectId,
         voter_name: v.voterName,
         device_hash: v.deviceHash,
-        created_at: v.createdAt
-      }))
-    });
-  }
-
-  return res.json({ 
-    votes: votes.map(v => ({
-      ...v,
-      project_id: v.projectId,
-      voter_name: v.voterName,
-      device_hash: v.deviceHash,
-      created_at: v.createdAt
-    }))
+        created_at: v.createdAt,
+        // Include project details
+        teamNumber: project?.teamNumber || v.projectId,
+        projectTitle: project?.title || "Unknown",
+        department: project?.department || "",
+        sector: project?.sector || ""
+      };
+    })
   });
 };
