@@ -287,6 +287,64 @@ const initDashboard = async () => {
     await loadVotes(filters);
   });
 
+  document.getElementById("clear-filters").addEventListener("click", async () => {
+    document.getElementById("filter-title").value = "";
+    document.getElementById("filter-team").value = "";
+    document.getElementById("filter-department").value = "";
+    document.getElementById("filter-sector").value = "";
+    document.getElementById("filter-min").value = "";
+    document.getElementById("filter-max").value = "";
+    await loadVotes({});
+  });
+
+  document.getElementById("download-all-qr").addEventListener("click", async () => {
+    if (!projectCache || projectCache.length === 0) {
+      alert("No QR codes available to download");
+      return;
+    }
+
+    try {
+      const zip = new JSZip();
+      const imgFolder = zip.folder("tejas2026-qr-codes");
+
+      for (const project of projectCache) {
+        try {
+          const qrUrl = project.qrDataUrl || `${API_URL}/qr/${project.id}.png`;
+          
+          // Fetch QR image as blob
+          let blob;
+          if (qrUrl.startsWith("data:")) {
+            // Convert data URL to blob
+            const response = await fetch(qrUrl);
+            blob = await response.blob();
+          } else {
+            // Fetch from server
+            const response = await fetch(qrUrl);
+            if (!response.ok) throw new Error(`Failed to fetch QR for ${project.id}`);
+            blob = await response.blob();
+          }
+
+          // Add to ZIP with filename: TeamNumber_ProjectTitle.png
+          const filename = `${project.teamNumber || project.id}_${(project.title || "Project").replace(/[^a-zA-Z0-9]/g, "_")}.png`;
+          imgFolder.file(filename, blob);
+        } catch (err) {
+          console.error(`Failed to add ${project.id} to ZIP:`, err);
+        }
+      }
+
+      // Generate and download ZIP
+      const zipBlob = await zip.generateAsync({ type: "blob" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(zipBlob);
+      link.download = `tejas2026-all-qr-codes-${new Date().toISOString().slice(0, 10)}.zip`;
+      link.click();
+      URL.revokeObjectURL(link.href);
+    } catch (error) {
+      console.error("Error creating ZIP:", error);
+      alert("Failed to create ZIP file. Please try again.");
+    }
+  });
+
   logoutBtn.addEventListener("click", () => {
     console.log("[AUTH] Logging out...");
     clearToken();

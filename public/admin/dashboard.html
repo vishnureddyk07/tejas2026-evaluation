@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin Dashboard | TEJAS 2026</title>
   <link rel="stylesheet" href="/admin/admin.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 </head>
 <body>
   <main class="dashboard">
@@ -62,7 +63,10 @@
       </div>
 
       <div class="glass-card">
-        <h3>QR Gallery</h3>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <h3 style="margin: 0;">QR Gallery</h3>
+          <button id="download-all-qr" class="primary-btn">Download All as ZIP</button>
+        </div>
         <div id="qr-gallery" class="qr-gallery"></div>
       </div>
     </section>
@@ -77,6 +81,7 @@
         <input id="filter-min" type="number" min="0" max="10" placeholder="Min score" />
         <input id="filter-max" type="number" min="0" max="10" placeholder="Max score" />
         <button id="apply-filters" class="primary-btn">Apply Filters</button>
+        <button id="clear-filters" class="ghost-btn">Clear Filters</button>
       </div>
       <div class="table-wrap">
         <table>
