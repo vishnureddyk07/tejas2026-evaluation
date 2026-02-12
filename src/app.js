@@ -61,7 +61,7 @@ app.get("/vote", (req, res) => {
 
 app.get("/qr/:projectId.png", async (req, res) => {
   try {
-    // Set CORS headers for cross-origin image loading
+    // Set CORS headers explicitly for cross-origin image loading from Vercel frontend
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Methods", "GET");
     res.setHeader("Content-Type", "image/png");
