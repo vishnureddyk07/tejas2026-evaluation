@@ -89,7 +89,7 @@ const renderGallery = (container, projects, onSelect) => {
   });
 };
 
-const renderVotes = (tbody, votes) => {
+const renderVotes = (tbody, votes, onReloadVotes) => {
   if (!tbody) return;
   tbody.innerHTML = "";
   votes.forEach((vote) => {
@@ -118,7 +118,7 @@ const renderVotes = (tbody, votes) => {
           });
           console.log("[DELETE] Success:", response);
           alert("Vote deleted successfully!");
-          await loadVotes(); // Reload votes
+          if (onReloadVotes) await onReloadVotes(); // Reload votes
         } catch (error) {
           console.error("[DELETE] Error:", error);
           alert("Failed to delete vote: " + error.message);
@@ -218,7 +218,7 @@ const initDashboard = async () => {
     currentVotes = data.votes || [];
     scoreSortState = 0; // Reset sort state when loading new data
     document.getElementById("score-sort-indicator").textContent = "";
-    renderVotes(resultsTable, currentVotes);
+    renderVotes(resultsTable, currentVotes, loadVotes);
     
     // Display statistics
     const stats = data.stats || { count: 0, totalScore: 0, averageScore: 0 };
@@ -357,7 +357,7 @@ const initDashboard = async () => {
       indicator.textContent = "";
     }
     
-    renderVotes(resultsTable, sortedVotes);
+    renderVotes(resultsTable, sortedVotes, loadVotes);
   });
 
   document.getElementById("download-all-qr").addEventListener("click", async () => {
