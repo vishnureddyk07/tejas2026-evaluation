@@ -150,13 +150,14 @@ export const deleteProjectAdmin = async (req, res) => {
 };
 
 export const getVotesAdmin = async (req, res) => {
-  const { projectTitle, teamNumber, department, sector, minScore, maxScore } = req.query;
+  const { projectTitle, teamNumber, department, sector, voterName, minScore, maxScore } = req.query;
   
   // Clean up empty string filters
   const cleanProjectTitle = projectTitle && projectTitle.trim() !== "" ? projectTitle.trim() : null;
   const cleanTeamNumber = teamNumber && teamNumber.trim() !== "" ? teamNumber.trim() : null;
   const cleanDepartment = department && department.trim() !== "" ? department.trim() : null;
   const cleanSector = sector && sector.trim() !== "" ? sector.trim() : null;
+  const cleanVoterName = voterName && voterName.trim() !== "" ? voterName.trim() : null;
   
   // Fetch all votes with score filters
   const voteFilters = {
@@ -179,7 +180,7 @@ export const getVotesAdmin = async (req, res) => {
   
   // Apply project filters if specified
   let filteredVotes = votes;
-  if (cleanProjectTitle || cleanTeamNumber || cleanDepartment || cleanSector) {
+  if (cleanProjectTitle || cleanTeamNumber || cleanDepartment || cleanSector || cleanVoterName) {
     filteredVotes = votes.filter(v => {
       const project = projectMap.get(v.projectId);
       if (!project) return false;
@@ -188,27 +189,40 @@ export const getVotesAdmin = async (req, res) => {
       const teamMatch = !cleanTeamNumber || project.teamNumber === cleanTeamNumber;
       const deptMatch = !cleanDepartment || (project.department && project.department.toLowerCase().includes(cleanDepartment.toLowerCase()));
       const sectorMatch = !cleanSector || (project.sector && project.sector.toLowerCase().includes(cleanSector.toLowerCase()));
+      const voterMatch = !cleanVoterName || (v.voterName && v.voterName.toLowerCase().includes(cleanVoterName.toLowerCase()));
       
-      return titleMatch && teamMatch && deptMatch && sectorMatch;
+      return titleMatch && teamMatch && deptMatch && sectorMatch && voterMatch;
     });
   }
 
   // Map votes with project details
+  const mappedVotes = filteredVotes.map(v => {
+    const project = projectMap.get(v.projectId);
+    return {
+      ...v,
+      project_id: v.projectId,
+      voter_name: v.voterName,
+      device_hash: v.deviceHash,
+      created_at: v.createdAt,
+      // Include project details
+      teamNumber: project?.teamNumber || v.projectId,
+      projectTitle: project?.title || "Unknown",
+      department: project?.department || "",
+      sector: project?.sector || ""
+    };
+  });
+
+  // Calculate statistics
+  const stats = {
+    count: filteredVotes.length,
+    totalScore: filteredVotes.reduce((sum, v) => sum + (v.score || 0), 0),
+    averageScore: filteredVotes.length > 0 
+      ? filteredVotes.reduce((sum, v) => sum + (v.score || 0), 0) / filteredVotes.length 
+      : 0
+  };
+
   return res.json({ 
-    votes: filteredVotes.map(v => {
-      const project = projectMap.get(v.projectId);
-      return {
-        ...v,
-        project_id: v.projectId,
-        voter_name: v.voterName,
-        device_hash: v.deviceHash,
-        created_at: v.createdAt,
-        // Include project details
-        teamNumber: project?.teamNumber || v.projectId,
-        projectTitle: project?.title || "Unknown",
-        department: project?.department || "",
-        sector: project?.sector || ""
-      };
-    })
+    votes: mappedVotes,
+    stats: stats
   });
 };

@@ -194,6 +194,20 @@ const initDashboard = async () => {
     const query = new URLSearchParams(cleanFilters).toString();
     const data = await apiFetch(`/api/admin/votes?${query}`);
     renderVotes(resultsTable, data.votes || []);
+    
+    // Display statistics
+    const stats = data.stats || { count: 0, totalScore: 0, averageScore: 0 };
+    const statsDiv = document.getElementById("filter-stats");
+    const hasFilters = Object.keys(cleanFilters).length > 0;
+    
+    if (hasFilters && stats.count > 0) {
+      document.getElementById("stat-count").textContent = stats.count;
+      document.getElementById("stat-avg").textContent = stats.averageScore.toFixed(2);
+      document.getElementById("stat-total").textContent = stats.totalScore;
+      statsDiv.style.display = "block";
+    } else {
+      statsDiv.style.display = "none";
+    }
   };
 
   createBtn.addEventListener("click", async () => {
@@ -281,6 +295,7 @@ const initDashboard = async () => {
       teamNumber: document.getElementById("filter-team").value.trim(),
       department: document.getElementById("filter-department").value.trim(),
       sector: document.getElementById("filter-sector").value.trim(),
+      voterName: document.getElementById("filter-voter").value.trim(),
       minScore: document.getElementById("filter-min").value,
       maxScore: document.getElementById("filter-max").value
     };
@@ -292,6 +307,7 @@ const initDashboard = async () => {
     document.getElementById("filter-team").value = "";
     document.getElementById("filter-department").value = "";
     document.getElementById("filter-sector").value = "";
+    document.getElementById("filter-voter").value = "";
     document.getElementById("filter-min").value = "";
     document.getElementById("filter-max").value = "";
     await loadVotes({});
